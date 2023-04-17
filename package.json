@@ -62,9 +62,9 @@
   "author": "SendBird <support@sendbird.com>",
   "license": "SEE LICENSE IN LICENSE.md",
   "peerDependencies": {
+    "@sendbird/chat": "^4.2.3",
     "react": "^16.8.6 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.8.6 || ^17.0.0 || ^18.0.0",
-    "@sendbird/chat": "^4.2.3"
+    "react-dom": "^16.8.6 || ^17.0.0 || ^18.0.0"
   },
   "dependencies": {
     "css-vars-ponyfill": "^2.3.2",
