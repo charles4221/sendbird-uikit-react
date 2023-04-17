@@ -10,33 +10,69 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
     steps:
-       - uses: actions/checkout@v3
-       - uses: actions/setup-node@v3
-         with:
-           node-version: 16
-       - run: npm run test
-       - run: npm run lint
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.2.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install yarn
+        run: |
+          COREPACK_PATH=$HOME/.local/bin
+          mkdir -p $COREPACK_PATH
+          eval "$(echo PATH=$COREPACK_PATH:\$PATH | tee -a $BASH_ENV)"
+          corepack enable --install-directory $COREPACK_PATH
+          yarn install --immutable
+          yarn --version
+      - run: yarn run eslint
+      - run: yarn run eslint-ts
+      - run: yarn run test
 
   build:
     needs: test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.2.0
         with:
-          node-version: 16
-      - run: npm run build
+          node-version: ${{ matrix.node-version }}
+      - name: Install yarn
+        run: |
+          COREPACK_PATH=$HOME/.local/bin
+          mkdir -p $COREPACK_PATH
+          eval "$(echo PATH=$COREPACK_PATH:\$PATH | tee -a $BASH_ENV)"
+          corepack enable --install-directory $COREPACK_PATH
+          yarn install --immutable
+          yarn --version
+      - run: yarn build
 
   publish-npm:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.2.0
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - run: npm run build
+          node-version: ${{ matrix.node-version }}
+      - name: Install yarn
+        run: |
+          COREPACK_PATH=$HOME/.local/bin
+          mkdir -p $COREPACK_PATH
+          eval "$(echo PATH=$COREPACK_PATH:\$PATH | tee -a $BASH_ENV)"
+          corepack enable --install-directory $COREPACK_PATH
+          yarn install --immutable
+          yarn --version
+      - run: yarn build
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
